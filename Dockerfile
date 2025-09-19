@@ -1,34 +1,37 @@
 # Stage 1: build the application
 FROM node:20-alpine AS builder
 
-# Create app directory
+# Define o diretório de trabalho
 WORKDIR /app
 
-# Copy package definition files first for better caching
-COPY package*.json ./
+# Copia os arquivos de definição de pacotes da subpasta 'linkedin-post'
+COPY linkedin-post/package*.json ./
 
-# Install dependencies
+# Instala as dependências
 RUN npm install
 
-# Copy the rest of the source code
-COPY . .
+# Copia todo o código-fonte da aplicação da subpasta 'linkedin-post'
+COPY linkedin-post/ .
 
-# Build the application for production (static files will be under /app/dist)
+# Executa o build da aplicação
 RUN npm run build
 
-# Stage 2: serve the built files in a lightweight container
+# Stage 2: serve os arquivos estáticos em um contêiner leve
 FROM node:20-alpine AS runner
 
 WORKDIR /app
-
-# Install a simple static file server
+# Instala um servidor de arquivos estáticos simples
 RUN npm install -g serve
 
-# Copy built assets from the previous stage
+# Copia os arquivos compilados do estágio anterior
 COPY --from=builder /app/dist ./dist
 
-# Expose port (Coolify will map this automatically)
+# Copia o entrypoint script e concede permissão de execução
+COPY --from=builder /app/entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+
+# Expõe a porta (o Coolify fará o mapeamento automaticamente)
 EXPOSE 3000
 
-# Start the app with "serve"
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# Define o comando de entrada para iniciar o servidor
+ENTRYPOINT ["./entrypoint.sh"]
