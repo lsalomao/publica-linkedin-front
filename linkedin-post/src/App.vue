@@ -21,19 +21,11 @@
 import { ref } from 'vue'
 import axios from 'axios' // Usado para chamar a API Postagem
 
-// Armazena o valor do campo “Tema”
+ // Armazena o valor do campo "Tema"
 const tema = ref('')
 
-/* ------------------------------------------------------------------
-  Configuração de URLs da API
-  - Durante o desenvolvimento usamos o proxy Vite (API_PROXY_URL)
-  - Em produção, definimos VITE_API_URL (ex.: https://api.seudominio.com)
------------------------------------------------------------------- */
-const API_PROXY_URL = '/api/Postagem' // Proxy Vite (evita CORS em dev)
-const API_PROD_URL = `${import.meta.env.VITE_API_URL || ''}/Postagem`
-
-// Seleciona a URL apropriada conforme ambiente
-const apiUrl = import.meta.env.DEV ? API_PROXY_URL : API_PROD_URL
+// Recebe diretamente a URL da API do .env
+const apiUrl = `${import.meta.env.VITE_API_URL}/Postagem`
 
 /* ------------------------------------------------------------------
   Função savePost:
